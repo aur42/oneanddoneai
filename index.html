@@ -112,6 +112,10 @@ pre{background:var(--code-bg);color:var(--code-ink);border-radius:14px;padding:1
 .footer-line{margin-top:auto;padding-top:40px;font-size:14px;color:var(--muted);text-align:center}
 table{font-size:18px}
 @media (max-width:560px){h1{font-size:36px}h2{font-size:30px}.btn{font-size:22px}}
+.langbar{display:flex;gap:10px;margin:0 0 26px}
+.langopt{flex:1;min-height:64px;padding:14px 8px;font:inherit;font-size:21px;font-weight:600;border:3px solid var(--line);border-radius:16px;background:var(--surface2);color:var(--ink);cursor:pointer}
+.langopt.on{border-color:var(--accent);background:var(--accent-soft);font-weight:800}
+.langopt:focus-visible{outline:4px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.spinner,li.doing .dot,.big-icon.ok,#screen-working .spinner{animation:none !important}.screen.active{animation:none}}
 
 </style>
@@ -126,9 +130,10 @@ table{font-size:18px}
 
   <!-- WELCOME -->
   <section class="screen active" id="screen-welcome">
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:18px">
-      <button type="button" id="langEnBtn" class="btn quiet" style="width:auto;min-height:44px;font-size:16px;padding:8px 16px;margin:0">English</button>
-      <button type="button" id="langKoBtn" class="btn quiet" style="width:auto;min-height:44px;font-size:16px;padding:8px 16px;margin:0">한국어</button>
+    <div class="langbar" role="group" aria-label="Language / 언어 / Idioma">
+      <button type="button" id="langEnBtn" class="langopt">English</button>
+      <button type="button" id="langKoBtn" class="langopt">한국어</button>
+      <button type="button" id="langEsBtn" class="langopt">Español</button>
     </div>
     <div aria-hidden="true" style="font-size:44px;line-height:1;margin-bottom:10px">👆 ✨</div>
     <h1 id="welcomeH1">Every AI you use. One memory.</h1>
@@ -454,6 +459,14 @@ table{font-size:18px}
     <p class="lede" id="extrasLede">Optional, forever. Your setup already works without these — and your AI can do any of them with you, anytime. You never need to come back here for them.</p>
     <button class="btn secondary" id="backToDoneBtn" type="button">Back</button>
     <button class="btn" id="extrasFullSetBtn" type="button">Get more AIs (free)</button>
+        <details id="decisionsDetails">
+      <summary>Choices we made for you</summary>
+      <p id="decisionsSentence">Your home starts with expert defaults, saved in DECISIONS.md, plus a few open choices. You can change any of them anytime — just ask your AI.</p>
+      <div class="block-head"><h3 id="decisionsBlockH">Settle them one at a time</h3>
+      <button class="btn small-btn secondary" id="decisionsCopyBtn" type="button">Copy</button></div>
+      <pre id="decisionsPre">Read DECISIONS.md in my home. When a situation matches an open decision, ask me that one question, save my answer, and follow it. One at a time, never a list.</pre>
+    </details>
+
     <details id="scoreboardDetails">
       <summary>Your best-practices scoreboard</summary>
       <p class="small">From <code>BEST-PRACTICES.md</code>, the shared register of what we've learned building agent setups like this. Only checks this page actually verified during your setup are listed — anything not verified is not claimed.</p>
@@ -464,6 +477,13 @@ table{font-size:18px}
       <details>
       <summary>Bring what your tools already know</summary>
       <p>Already have memory files — a Claude or Muse export, ChatGPT or Grok notes, plain local files? Add them here. This page reads them <em>in your browser only</em>, pulls out candidate memories, drops exact duplicates, and shows you every conflict to settle yourself. <strong>Nothing is silently overwritten, ever</strong> — where two files disagree, you pick.</p>
+            <h3 id="notionImportH">Notion — bring it in as files</h3>
+      <p class="small" id="notionImportNote">Honest label: this is a <strong>file import</strong>, not a live connection. You export once, and the files join the same reconcile below.</p>
+      <ol class="small" id="notionImportSteps" style="margin:8px 0;padding-left:24px;line-height:1.7">
+        <li>Open the Notion app → Settings → Export all workspace content.</li>
+        <li>If it arrives as a zip, unzip it.</li>
+        <li>Come back here and add the Markdown (.md) files with the picker below — they reconcile exactly like an AI app's export.</li>
+      </ol>
       <label for="importFiles">Memory files (.md, .txt, .json — pick as many as you have)</label>
       <input type="file" id="importFiles" accept=".md,.txt,.json,text/markdown,text/plain,application/json" multiple />
       <div class="okbox" id="importSummary"></div>
@@ -480,6 +500,26 @@ table{font-size:18px}
           <p class="small">Load them with <code>tools/import_md.py</code> from your repo, or paste into your own import. <code>owner_id</code> is left as <code>YOUR-AUTH-USER-ID</code> on purpose: it must be your Supabase auth user id, and this page will not invent one.</p>
         </div>
       </div>
+      </details>
+    </div>
+
+    <div id="stepNotion">
+      <details id="notionDetails">
+      <summary>Notion</summary>
+      <p id="notionIntro">Two honest paths — pick either, both, or neither. Your home stays the original either way.</p>
+      <h3 id="notionImportPathH">1. Import what Notion already holds</h3>
+      <p class="small" id="notionImportPathP">Use “Bring what your tools already know” above: export from Notion (app → Settings → Export all workspace content) and add the .md files. A one-time file import — not a live link.</p>
+      <h3 id="notionMirrorPathH">2. Keep a Notion page as a mirror (optional)</h3>
+      <p><span class="tag" id="notionMirrorTag">Mirror only — your home stays the original</span></p>
+      <p class="small" id="notionMirrorP">Paste this into your AI app. It keeps one Notion page updated as a readable copy of your home. Changes flow one way only — home → Notion — never back.</p>
+      <div class="block-head"><h3 id="notionMirrorH">Notion mirror</h3>
+      <button class="btn small-btn secondary" id="notionMirrorCopyBtn" type="button">Copy</button></div>
+      <pre id="notionMirrorPre">Keep a mirror of my agent home in Notion, one way only.
+
+1. Read MEMORY.md, USER.md and DECISIONS.md in my home.
+2. Update my Notion page titled “My agent home — mirror” so it matches them as a clean, readable summary.
+3. Mirror only: never edit my home based on the Notion page, and if the two disagree, my home wins.
+4. Tell me in one line what changed.</pre>
       </details>
     </div>
 
@@ -512,7 +552,7 @@ table{font-size:18px}
       <input type="text" id="mDb" placeholder="https://xxxx.supabase.co" autocomplete="off" spellcheck="false" />
       <button class="btn secondary" id="dlBtn" type="button">Download all template files</button>
       <p class="small" style="margin-top:8px">Your browser will save each file one by one — allow multiple downloads if it asks. Files:</p>
-      <p class="filelist">README.md · SOUL.md · IDENTITY.md · USER.md · AGENTS.md · MEMORY.md · CONNECT.md · ORCHESTRATION.md · BEST-PRACTICES.md · skills/README.md · skills/memory-hygiene.md · skills/verify-before-claiming.md · skills/import-and-reconcile.md · agent.config.example.json · .env.example · .gitignore · db/001_starter_schema.sql · tools/import_md.py</p>
+      <p class="filelist">README.md · SOUL.md · IDENTITY.md · USER.md · AGENTS.md · MEMORY.md · DECISIONS.md · CONNECT.md · ORCHESTRATION.md · BEST-PRACTICES.md · skills/README.md · skills/memory-hygiene.md · skills/verify-before-claiming.md · skills/import-and-reconcile.md · agent.config.example.json · .env.example · .gitignore · db/001_starter_schema.sql · tools/import_md.py</p>
       <div id="manualBlocks"></div>
       </details>
     </div>
@@ -631,6 +671,7 @@ return "# "+v.repoName+" — my agent home\n\n"+
 "- `USER.md` — who I am. `IDENTITY.md` — names and handles for me and my assistant.\n"+
 "- `SOUL.md` — the assistant's persona. `AGENTS.md` — how the assistant should work.\n"+
 "- `MEMORY.md` — curated long-term memory (the distilled version; the full store is the database).\n"+
+"- `DECISIONS.md` — the choices set for you at setup, and the open choices to settle later, one at a time.\n"+
 "- `CONNECT.md` — the paste blocks that point each of my AI tools at this repo and database.\n"+
 "- `agent.config.json` — non-secret config only: project reference and public URL. **No keys, ever.**\n"+
 "- `db/` — the database schema and migrations.\n"+
@@ -950,6 +991,28 @@ function connectBlock(tool,v){
   "5. Never ask for, print, or commit my credentials. Keys live only in a local .env file on my machine. The only key an app may ever receive from that file is the one named SUPABASE_ANON_KEY — never the service-role key, which is importer-only.\n\n"+
   "Confirm you've read the files by telling me, in one line each: who I am, what I'm working on, and one open loop from MEMORY.md.";
 }
+function tplDecisions(v){
+return "# DECISIONS.md — choices made for you, and choices still open\n\n"+
+"Expert defaults were set at setup so this home works well from day one. You can change any of them anytime — just ask your assistant. Open choices are settled one at a time, in context, when they actually come up — never as a questionnaire.\n\n"+
+"## Defaults in force\n\n"+
+"- The database is the canonical store; the Markdown files are the readable layer.\n"+
+"- Private by default: nothing leaves this home, and credentials never enter the repo.\n"+
+"- Verify before claiming: done means checked, not just attempted.\n"+
+"- A correction from you beats any older source, and blocks the stale source from refilling it.\n"+
+"- The assistant's own words never count as evidence about you.\n"+
+"- Same settings everywhere is the default. A setting may differ per app only when you mark it intentionally separate (scoped) — then it is recorded here and never flagged as a conflict.\n"+
+"- Notion, if used, is a one-way mirror only: home \u2192 Notion. The home stays the original.\n\n"+
+"## Open choices — ask me one at a time\n\n"+
+"<!-- When a situation matches one of these, the assistant asks that ONE question, saves the answer under Settled, and follows it. -->\n"+
+"1. What should the assistant be called?\n"+
+"2. How proactive should it be — speak up on its own, or only when asked?\n"+
+"3. What voice: short and direct, or warm and detailed?\n"+
+"4. Should any setting be different in one app on purpose (scoped)? Which, and why?\n"+
+"5. Do you want a Notion mirror page kept updated?\n"+
+"6. Which languages and timezone should it reason in by default?\n\n"+
+"## Settled\n\n"+
+"<!-- Answers land here, dated, as open choices get decided. -->\n";
+}
 function tplConnect(v){
   var out="# CONNECT.md — point every AI tool at this home\n\n"+
   "There is no shared one-click sign-in across AI tools, so each tool gets a paste block. Paste the block for a tool as its first message, or into its custom / project instructions. Re-paste after big changes to `AGENTS.md` or `USER.md`.\n";
@@ -1032,6 +1095,7 @@ function templateFiles(v){
     {path:"USER.md",content:tplUser(v)},
     {path:"AGENTS.md",content:tplAgents(v)},
     {path:"MEMORY.md",content:tplMemory(v)},
+    {path:"DECISIONS.md",content:tplDecisions(v)},
     {path:"CONNECT.md",content:tplConnect(v)},
     {path:"agent.config.example.json",content:tplConfigExample(v)},
     {path:".env.example",content:tplEnvExample(v)},
@@ -1405,6 +1469,7 @@ function showDone(){
   $("doneLinks").innerHTML=links;
   maybeRegister();
   renderScoreboard();
+  updateNotionMirror();
   renderConfirm("confirmBlocks",v);
   renderBlocks("doneBlocks",v);
   loadProofBubble();
@@ -1663,7 +1728,7 @@ function finalMemories(){
   var st=S.importState, out=st.accepted.slice();
   st.conflicts.forEach(function(c,i){
     var r=st.resolutions[i];
-    if(r==="both")out=out.concat(c.items);
+    if(r==="both"||r==="scoped")out=out.concat(c.items);
     else out.push(c.items[parseInt(r,10)||0]);
   });
   return out;
@@ -1680,10 +1745,16 @@ function buildImportDocs(){
   st.conflicts.forEach(function(c,i){
     var r=st.resolutions[i];
     rep+="- **"+c.topic+"** — "+c.items.map(function(x){return "“"+x.value+"” ("+x.source+")";}).join(" vs ")+
-      " → resolution: "+(r==="both"?"kept both, flagged as contested":"kept “"+c.items[parseInt(r,10)||0].value+"”")+"\n";
+      " → resolution: "+(r==="scoped"?"kept both — intentionally separate, scoped ("+scopeLabel(c)+"), never re-flagged":r==="both"?"kept both, flagged as contested":"kept “"+c.items[parseInt(r,10)||0].value+"”")+"\n";
   });
   rep+="\n## Imported\n\n"+mems.length+" memories written to MEMORY.md and prepared as rows for the `memories` table.\n";
   st.reportMd=rep;
+}
+function scopeLabel(cf){
+  return cf.items.map(function(it){
+    var src=String(it.source||"one app").replace(/\.[a-z0-9]+$/i,"").replace(/[-_]+/g," ");
+    return src+" only";
+  }).join(" / ");
 }
 function renderImport(){
   var st=S.importState; buildImportDocs();
@@ -1693,21 +1764,26 @@ function renderImport(){
   st.conflicts.forEach(function(cf,i){
     var box=document.createElement("div");
     box.style.cssText="border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0;background:var(--surface2)";
-    var h=document.createElement("h3"); h.style.margin="0 0 4px"; h.textContent="Your files disagree: "+cf.topic;
-    var p=document.createElement("p"); p.className="small"; p.textContent="Pick what your assistant should believe. Nothing changes until you choose.";
-    box.appendChild(h); box.appendChild(p);
+    var h=document.createElement("h3"); h.style.margin="0 0 4px"; h.textContent=tt("Your files disagree: "+cf.topic,"파일이 서로 달라요: "+cf.topic,"Tus archivos no coinciden: "+cf.topic);
+    var p=document.createElement("p"); p.className="small"; p.textContent=tt("Pick what your assistant should believe. Nothing changes until you choose.","AI가 뭘 믿을지 골라 주세요. 고르기 전엔 안 바뀌어요.","Elige qué debe creer tu asistente. Nada cambia hasta que elijas.");
+    var p2=document.createElement("p"); p2.className="small"; p2.textContent=tt("Same everywhere is the default. Separate is fine when it's on purpose — choose “different on purpose” and it's recorded as intentionally separate ("+scopeLabel(cf)+"), never flagged again.","기본은 어디서나 같아요. 일부러 다르면 괜찮아요 — “일부러 달라요”를 고르면 나눠 둔 것으로 기록돼요 ("+scopeLabel(cf)+"). 다시 문제로 뜨지 않아요.","Lo normal es lo mismo en todas partes. Separado está bien cuando es a propósito — elige «diferente a propósito» y queda registrado como intencional ("+scopeLabel(cf)+"), sin volver a marcarse.");
+    box.appendChild(h); box.appendChild(p); box.appendChild(p2);
     cf.items.forEach(function(it,j){
       var b=document.createElement("button"); b.className="btn secondary small-btn"; b.type="button";
-      b.style.margin="4px 6px 4px 0"; b.textContent="Keep: “"+it.value+"” ("+it.source+")";
+      b.style.margin="4px 6px 4px 0"; b.textContent=tt("Keep: “"+it.value+"” ("+it.source+")","이걸 유지해요: “"+it.value+"” ("+it.source+")","Quedarme con: «"+it.value+"» ("+it.source+")");
       b.addEventListener("click",function(){ st.resolutions[i]=String(j); renderImport(); });
       box.appendChild(b);
     });
     var both=document.createElement("button"); both.className="btn secondary small-btn"; both.type="button";
-    both.style.margin="4px 0"; both.textContent="Keep both, flagged";
+    both.style.margin="4px 0"; both.textContent=tt("Keep both, flagged","둘 다 유지해요, 표시해 둬요","Quedarme con los dos, marcados");
     both.addEventListener("click",function(){ st.resolutions[i]="both"; renderImport(); });
     box.appendChild(both);
+    var scoped=document.createElement("button"); scoped.className="btn secondary small-btn"; scoped.type="button";
+    scoped.style.margin="4px 0"; scoped.textContent=tt("Keep both — different on purpose","둘 다 유지해요 — 일부러 달라요","Los dos — diferente a propósito");
+    scoped.addEventListener("click",function(){ st.resolutions[i]="scoped"; renderImport(); });
+    box.appendChild(scoped);
     var cur=document.createElement("p"); cur.className="small"; var r=st.resolutions[i];
-    cur.textContent="Your choice so far: "+(r==="both"?"keep both, flagged as contested":"keep “"+cf.items[parseInt(r,10)||0].value+"”");
+    cur.textContent=tt("Your choice so far: ","지금 선택: ","Tu elección hasta ahora: ")+(r==="scoped"?tt("keep both — intentionally separate ("+scopeLabel(cf)+")","둘 다 유지 — 일부러 나눠 뒀어요 ("+scopeLabel(cf)+")","los dos — separados a propósito ("+scopeLabel(cf)+")"):r==="both"?tt("keep both, flagged as contested","둘 다 유지, 표시해 뒀어요","los dos, marcados en disputa"):tt("keep “"+cf.items[parseInt(r,10)||0].value+"”","이걸 유지해요 “"+cf.items[parseInt(r,10)||0].value+"”","quedarme con «"+cf.items[parseInt(r,10)||0].value+"»"));
     box.appendChild(cur);
     c.appendChild(box);
   });
@@ -1799,6 +1875,15 @@ function checkAdminHash(){
   showAdmin();
 }
 
+function updateNotionMirror(){
+  var pre=$("notionMirrorPre"); if(!pre)return;
+  var home=S.repoUrl?("My home (the original): "+S.repoUrl):"My home (the original) is the private repo and database from my setup.";
+  pre.textContent="Keep a mirror of my agent home in Notion, one way only.\n\n"+home+"\n\n"+
+  "1. Read MEMORY.md, USER.md and DECISIONS.md in my home.\n"+
+  "2. Update my Notion page titled “My agent home — mirror” so it matches them as a clean, readable summary.\n"+
+  "3. Mirror only: never edit my home based on the Notion page, and if the two disagree, my home wins.\n"+
+  "4. Tell me in one line what changed.";
+}
 /* ============ wiring of controls ============ */
 $("startBtn").addEventListener("click",function(){ showScreen("step0"); $("fName").focus({preventScroll:true}); });
 $("ghBtn").addEventListener("click",ghCreate);
@@ -1833,6 +1918,8 @@ $("importRowsBtn").addEventListener("click",function(){
   $("importRowsBox").classList.remove("hidden");
 });
 $("importRowsCopy").addEventListener("click",function(){ copyText($("importRowsPre").textContent,this); });
+var dcb=$("decisionsCopyBtn"); if(dcb)dcb.addEventListener("click",function(){ copyText($("decisionsPre").textContent,this); });
+var ncb=$("notionMirrorCopyBtn"); if(ncb)ncb.addEventListener("click",function(){ updateNotionMirror(); copyText($("notionMirrorPre").textContent,this); });
 $("regTick").addEventListener("change",function(){ if(this.checked)maybeRegister(); else {var n=$("regNote"); if(n&&CONFIG.registryUrl)n.textContent="Unticked — nothing will be sent.";} });
 initConnect();
 initGoogle();
@@ -1840,11 +1927,108 @@ handleOAuthReturn();
 checkAdminHash();
 refreshManual();
 
-/* ============ language (EN / KO) + session restore ============ */
+/* ============ language (EN / KO / ES) + session restore ============
+   Priority: ?lang= in the link wins over everything (the sharer pre-localises
+   for the recipient), then the saved toggle, then the browser language. */
 var LANG="en";
-try{var _sl=sessionStorage.getItem("ah_lang"); if(_sl)LANG=_sl; else if((navigator.language||"").toLowerCase().indexOf("ko")===0)LANG="ko";}catch(e){ if((navigator.language||"").toLowerCase().indexOf("ko")===0)LANG="ko"; }
+var ES_DICT={
+"Every AI you use. One memory.":"Todos los IA que usas. Una sola memoria.",
+"One private home, so every AI helper knows you.":"Un solo espacio privado, para que cada IA te conozca.",
+"Set up my agent home":"Crear mi espacio de IA",
+"One click. One time. Done.":"Un toque. Una sola vez. Listo.",
+"Do this once. You never need to come back — extras later? Just ask your AI.":"Hazlo una sola vez. No tienes que volver — ¿algo más después? Pregúntale a tu IA.",
+"OneAndDone · Free for the first members · Everything created is yours":"OneAndDone · Gratis para los primeros · Todo lo creado es tuyo",
+"What's your name?":"¿Cómo te llamas?",
+"This fills your home with your details.":"Esto llena tu espacio con tus datos.",
+"Continue with Google":"Continuar con Google",
+"Continue":"Continuar",
+"Please type your name first.":"Escribe tu nombre primero, por favor.",
+"Your name":"Tu nombre",
+"Your email":"Tu correo",
+"Do you have GitHub?":"¿Tienes GitHub?",
+"If not, we'll show you how.":"Si no, te mostramos cómo.",
+"I have GitHub":"Sí, tengo",
+"I don't have GitHub":"No tengo",
+"Nothing is public, ever.":"Nada es público, nunca.",
+"Create a GitHub account":"Crear una cuenta de GitHub",
+"It's free and takes two minutes.":"Es gratis y toma dos minutos.",
+"Open GitHub signup":"Abrir el registro de GitHub",
+"I have GitHub now":"Ya tengo GitHub",
+"Your private folder":"Tu carpeta privada",
+"Only you can ever see what's inside.":"Solo tú puedes ver lo que hay dentro.",
+"Connect and create it":"Conectar y crearla",
+"So your AIs share one memory.":"Para que tus IA compartan una memoria.",
+"Demo mode — use a code instead (in Details).":"Modo demo — usa un código (en Detalles).",
+"Connect GitHub":"Conectar GitHub",
+"Create my private folder":"Crear mi carpeta privada",
+"Your private memory":"Tu memoria privada",
+"Locked away, and only you hold the key.":"Guardada bajo llave, y solo tú tienes la llave.",
+"Create my private memory":"Crear mi memoria privada",
+"So they remember between chats.":"Para que recuerden entre chats.",
+"Skip for now":"Saltar por ahora",
+"Connect Supabase":"Conectar Supabase",
+"Create my memory store":"Crear mi espacio de memoria",
+"Load my groups":"Cargar mis grupos",
+"That didn't work":"No funcionó",
+"Try again":"Intentar de nuevo",
+"Go back":"Volver",
+"Get the full set. Free.":"Consigue el set completo. Gratis.",
+"Most people use just one AI. The others are free too.":"La mayoría usa una sola IA. Las demás también son gratis.",
+"You can add more AIs anytime — just ask your AI.":"Puedes agregar más IA cuando quieras — pregúntale a tu IA.",
+"Get it free":"Gratis",
+"You're done 🎉":"Ya terminaste 🎉",
+"You never need to come back here. Everything lives in your own accounts now — want extras later, just ask your AI.":"No tienes que volver aquí. Todo vive en tus propias cuentas — ¿algo más después? Pregúntale a tu IA.",
+"Your AIs can now remember you properly — expert-level setup, done once.":"Ahora tus IA te recuerdan bien — nivel experto, en una sola vez.",
+"Show my copy-paste messages":"Ver mis textos para pegar",
+"Hide my copy-paste messages":"Ocultar mis textos para pegar",
+"Paste once into each app.":"Pega una vez en cada app.",
+"Bring old memories (optional)":"Traer recuerdos viejos (opcional)",
+"Get more AIs (free)":"Más IA (gratis)",
+"Extras, if you want them":"Extras, si los quieres",
+"Optional, forever. Your setup already works without these — and your AI can do any of them with you, anytime. You never need to come back here for them.":"Opcional, siempre. Tu configuración ya funciona sin esto — y tu IA puede hacer cualquiera contigo, cuando quieras. No tienes que volver aquí.",
+"Back":"Volver",
+"Your home starts with expert defaults, saved in DECISIONS.md, plus a few open choices. You can change any of them anytime — just ask your AI.":"Tu espacio empieza con valores expertos, guardados en DECISIONS.md, y algunas decisiones abiertas. Puedes cambiar cualquiera cuando quieras — pregúntale a tu IA.",
+"Settle them one at a time":"Decídelas una por una",
+"Copy":"Copiar",
+"Notion — bring it in as files":"Notion — tráelo como archivos",
+"Honest label: this is a file import, not a live connection. You export once, and the files join the same reconcile below.":"Con honestidad: es importar archivos, no una conexión en vivo. Exportas una vez y los archivos se unen abajo.",
+"Two honest paths — pick either, both, or neither. Your home stays the original either way.":"Dos caminos honestos — elige uno, los dos o ninguno. Tu espacio sigue siendo el original.",
+"1. Import what Notion already holds":"1. Importa lo que Notion ya tiene",
+"Use “Bring what your tools already know” above: export from Notion (app → Settings → Export all workspace content) and add the .md files. A one-time file import — not a live link.":"Usa «Traer lo que tus herramientas ya saben» arriba: exporta de Notion (app → Ajustes → Exportar todo el contenido) y agrega los archivos .md. Es una sola vez — no es un enlace en vivo.",
+"2. Keep a Notion page as a mirror (optional)":"2. Deja una página de Notion como espejo (opcional)",
+"Mirror only — your home stays the original":"Solo espejo — tu espacio es el original",
+"Paste this into your AI app. It keeps one Notion page updated as a readable copy of your home. Changes flow one way only — home → Notion — never back.":"Pega esto en tu app de IA. Mantiene una página de Notion como copia fácil de leer de tu espacio. Los cambios van en un solo sentido — espacio → Notion — nunca al revés.",
+"Notion mirror":"Espejo de Notion",
+"Wire it together":"Conectar las dos partes",
+"Download all template files":"Descargar todos los archivos",
+"Details":"Detalles",
+"Having trouble? Connect with a code instead":"¿Problemas? Conecta con un código",
+"Copy-paste messages":"Textos para pegar",
+"Your best-practices scoreboard":"Tu lista verificada",
+"Bring what your tools already know":"Traer lo que tus herramientas ya saben",
+"Wire the two together":"Conectar las dos partes",
+"Just want the template?":"¿Solo quieres los archivos?",
+"Save this database password now":"Guarda esta contraseña ahora",
+"Choices we made for you":"Decisiones que tomamos por ti",
+"Someone shared this page with you so your AI helpers can actually remember you. It sets up two things in your own name, both private: a folder for your files, and a safe store for what your helpers learn about you — instead of every app forgetting you between chats.":"Alguien te compartió esta página para que tus IA te recuerden de verdad. Crea dos cosas a tu nombre, ambas privadas: una carpeta para tus archivos y un lugar seguro para lo que aprenden de ti — en vez de que cada app te olvide entre chats.",
+"<strong>Use this page once.</strong> After that, your AIs just work better — there is nothing here to come back to, no account with us, no app to download.":"<strong>Usa esta página una sola vez.</strong> Después, tus IA simplemente funcionan mejor — no hay nada a lo que volver, ni cuenta con nosotros, ni app que descargar.",
+"We'll open the right page — just tap Allow/Create, then come back.":"Abriremos la página correcta — toca Permitir/Crear y vuelve aquí.",
+"Read back from your home just now.":"Leído de tu espacio hace un momento.",
+"Done":"Listo",
+"Working…":"Trabajando…"
+};
+function urlLangParam(){ try{var v=new URLSearchParams(location.search).get("lang"); if(v){v=v.toLowerCase(); if(v==="ko"||v==="es"||v==="en")return v;} }catch(e){} return null; }
+try{
+  var _ul=urlLangParam();
+  if(_ul){ LANG=_ul; try{sessionStorage.setItem("ah_lang",LANG);}catch(e){} }
+  else{ var _sl=null; try{_sl=sessionStorage.getItem("ah_lang");}catch(e){}
+    if(_sl==="ko"||_sl==="es"||_sl==="en")LANG=_sl;
+    else{ var _bl=(navigator.language||"").toLowerCase(); if(_bl.indexOf("ko")===0)LANG="ko"; else if(_bl.indexOf("es")===0)LANG="es"; }
+  }
+}catch(e){}
 function isKo(){return LANG==="ko";}
-function tt(en,ko){return isKo()?ko:en;}
+function isEs(){return LANG==="es";}
+function tt(en,ko,es){ if(LANG==="es")return es||((typeof ES_DICT!=="undefined"&&ES_DICT)?ES_DICT[en]:null)||en; return LANG==="ko"?ko:en; }
 function savePlace(screenId){
   try{var cur={}; try{cur=JSON.parse(sessionStorage.getItem("ah_state")||"{}");}catch(e){}
     if(screenId)cur.screen=screenId;
@@ -1855,7 +2039,7 @@ function savePlace(screenId){
 function setText(sel,txt){var el=document.querySelector(sel); if(el&&txt!=null)el.textContent=txt;}
 function setTextId(id,txt){var el=$(id); if(el&&txt!=null)el.textContent=txt;}
 function applyLang(){
-  document.documentElement.lang=isKo()?"ko":"en";
+  document.documentElement.lang=LANG;
   var ko=isKo();
   // Welcome
   setTextId("welcomeH1",tt("Every AI you use. One memory.","쓰는 AI는 달라도, 기억은 하나예요."));
@@ -1924,29 +2108,48 @@ function applyLang(){
   setTextId("extrasLede",tt("Optional, forever. Your setup already works without these — and your AI can do any of them with you, anytime. You never need to come back here for them.","선택이에요. 없어도 잘 돼요 — 필요하면 언제든 AI와 함께 해요. 여기로 돌아올 필요 없어요."));
   setTextId("backToDoneBtn",tt("Back","돌아가기"));
   setTextId("extrasFullSetBtn",tt("Get more AIs (free)","AI 더 받기 (무료)"));
+  setTextId("decisionsSentence",tt("Your home starts with expert defaults, saved in DECISIONS.md, plus a few open choices. You can change any of them anytime — just ask your AI.","전문가 기본값으로 시작해요. DECISIONS.md에 적어 뒀어요. 언제든 바꿀 수 있어요 — AI에게 말해 주세요."));
+  setTextId("decisionsBlockH",tt("Settle them one at a time","하나씩 정해요"));
+  setTextId("decisionsCopyBtn",tt("Copy","복사"));
+  setTextId("notionMirrorCopyBtn",tt("Copy","복사"));
+  setTextId("notionImportH",tt("Notion — bring it in as files","Notion — 파일로 가져오기"));
+  setTextId("notionImportNote",tt("Honest label: this is a file import, not a live connection. You export once, and the files join the same reconcile below.","솔직히 말하면, 실시간 연결이 아니라 파일 가져오기예요. 한 번 내보내서 아래에서 함께 맞춰요."));
+  setTextId("notionIntro",tt("Two honest paths — pick either, both, or neither. Your home stays the original either way.","두 가지 방법이에요 — 하나만, 둘 다, 안 해도 돼요. 어느 쪽이든 원본은 내 공간이에요."));
+  setTextId("notionImportPathH",tt("1. Import what Notion already holds","1. Notion에 있는 것 가져오기"));
+  setTextId("notionImportPathP",tt("Use “Bring what your tools already know” above: export from Notion (app → Settings → Export all workspace content) and add the .md files. A one-time file import — not a live link.","위 “이미 아는 기억 가져오기”를 써요: Notion 앱 → 설정 → 모든 콘텐츠 내보내기에서 받은 .md 파일을 넣어요. 한 번만 하는 파일 가져오기예요 — 실시간 연결은 아니에요."));
+  setTextId("notionMirrorPathH",tt("2. Keep a Notion page as a mirror (optional)","2. Notion 페이지를 거울처럼 두기 (선택)"));
+  setTextId("notionMirrorTag",tt("Mirror only — your home stays the original","거울만 해요 — 원본은 내 공간이에요"));
+  setTextId("notionMirrorP",tt("Paste this into your AI app. It keeps one Notion page updated as a readable copy of your home. Changes flow one way only — home → Notion — never back.","이걸 AI 앱에 붙여넣어요. Notion 페이지 하나를 내 공간의 읽기 쉬운 사본으로 유지해요. 변경은 한쪽으로만 가요 — 내 공간 → Notion, 반대는 없어요."));
+  setTextId("notionMirrorH",tt("Notion mirror","Notion 거울"));
+  var nis=$("notionImportSteps"); if(nis)nis.innerHTML=tt("<li>Open the Notion app → Settings → Export all workspace content.</li><li>If it arrives as a zip, unzip it.</li><li>Come back here and add the Markdown (.md) files with the picker below — they reconcile exactly like an AI app's export.</li>","<li>Notion 앱 → 설정 → 모든 콘텐츠 내보내기를 열어요.</li><li>zip 파일로 오면 풀어 주세요.</li><li>여기로 돌아와 아래에서 .md 파일을 넣어요 — AI 앱 파일과 똑같이 맞춰요.</li>","<li>Abre la app de Notion → Ajustes → Exportar todo el contenido.</li><li>Si llega como zip, descomprímelo.</li><li>Vuelve aquí y agrega los archivos .md abajo — se unen igual que los de una app de IA.</li>");
   setTextId("wireBtn",tt("Wire it together","둘을 연결하기"));
   setTextId("dlBtn",tt("Download all template files","파일 모두 받기"));
   // Generic summaries: Details folds exist in Korean too (shorter essential prose below)
   document.querySelectorAll("details>summary").forEach(function(s){
     var t=s.textContent.trim();
-    if(t==="Details"||t==="자세히 보기")s.textContent=tt("Details","자세히 보기");
-    else if(t==="Having trouble? Connect with a code instead"||t==="안 돼요? 코드로 연결하기")s.textContent=tt("Having trouble? Connect with a code instead","안 돼요? 코드로 연결하기");
-    else if(t==="Copy-paste messages"||t==="붙여넣기 글")s.textContent=tt("Copy-paste messages","붙여넣기 글");
-    else if(t==="Your best-practices scoreboard"||t==="내 확인 목록")s.textContent=tt("Your best-practices scoreboard","내 확인 목록");
-    else if(t==="Bring what your tools already know"||t==="이미 아는 기억 가져오기")s.textContent=tt("Bring what your tools already know","이미 아는 기억 가져오기");
-    else if(t==="Wire the two together"||t==="둘 연결하기")s.textContent=tt("Wire the two together","둘 연결하기");
-    else if(t==="Just want the template?"||t==="파일만 원해요?")s.textContent=tt("Just want the template?","파일만 원해요?");
-    else if(t==="Save this database password now"||t==="비밀번호 저장하기")s.textContent=tt("Save this database password now","비밀번호 저장하기");
+    if(t==="Details"||t==="자세히 보기"||t==="Detalles")s.textContent=tt("Details","자세히 보기");
+    else if(t==="Having trouble? Connect with a code instead"||t==="안 돼요? 코드로 연결하기"||t==="¿Problemas? Conecta con un código")s.textContent=tt("Having trouble? Connect with a code instead","안 돼요? 코드로 연결하기");
+    else if(t==="Copy-paste messages"||t==="붙여넣기 글"||t==="Textos para pegar")s.textContent=tt("Copy-paste messages","붙여넣기 글");
+    else if(t==="Your best-practices scoreboard"||t==="내 확인 목록"||t==="Tu lista verificada")s.textContent=tt("Your best-practices scoreboard","내 확인 목록");
+    else if(t==="Bring what your tools already know"||t==="이미 아는 기억 가져오기"||t==="Traer lo que tus herramientas ya saben")s.textContent=tt("Bring what your tools already know","이미 아는 기억 가져오기");
+    else if(t==="Wire the two together"||t==="둘 연결하기"||t==="Conectar las dos partes")s.textContent=tt("Wire the two together","둘 연결하기");
+    else if(t==="Just want the template?"||t==="파일만 원해요?"||t==="¿Solo quieres los archivos?")s.textContent=tt("Just want the template?","파일만 원해요?");
+    else if(t==="Save this database password now"||t==="비밀번호 저장하기"||t==="Guarda esta contraseña ahora")s.textContent=tt("Save this database password now","비밀번호 저장하기");
+    else if(t==="Choices we made for you"||t==="대신 정해 둔 선택"||t==="Decisiones que tomamos por ti")s.textContent=tt("Choices we made for you","대신 정해 둔 선택");
+    else if(t==="Notion")s.textContent="Notion";
+    else if(t==="Optional: GitHub Secrets (manual — this page does not do this for you)")s.textContent=tt("Optional: GitHub Secrets (manual — this page does not do this for you)","선택: GitHub Secrets (직접 하기)","Opcional: GitHub Secrets (manual — esta página no lo hace por ti)");
   });
   // Details essential prose (Korean: shorter, essential content only)
-  var wp=document.querySelector("#screen-welcome details p"); if(wp)wp.textContent=tt("Someone shared this page with you so your AI helpers can actually remember you. It sets up two things in your own name, both private: a folder for your files, and a safe store for what your helpers learn about you — instead of every app forgetting you between chats.","AI가 나를 기억하게 하려고 누가 이 페이지를 보냈어요. 내 이름으로 비밀 폴더와 기억 공간을 만들어요. 앱마다 잊어버리지 않게요.");
-  var wp2=document.querySelectorAll("#screen-welcome details p")[1]; if(wp2)wp2.innerHTML=tt("<strong>Use this page once.</strong> After that, your AIs just work better — there is nothing here to come back to, no account with us, no app to download.","<strong>한 번만 쓰세요.</strong> 그 뒤엔 AI가 더 잘 도와요. 다시 올 곳도, 앱도 없어요.");
+  var wp=document.querySelector("#screen-welcome details p"); if(wp)wp.textContent=tt("Someone shared this page with you so your AI helpers can actually remember you. It sets up two things in your own name, both private: a folder for your files, and a safe store for what your helpers learn about you — instead of every app forgetting you between chats.","AI가 나를 기억하게 하려고 누가 이 페이지를 보냈어요. 내 이름으로 비밀 폴더와 기억 공간을 만들어요. 앱마다 잊어버리지 않게요.","Alguien te compartió esta página para que tus IA te recuerden de verdad. Crea dos cosas a tu nombre, ambas privadas: una carpeta para tus archivos y un lugar seguro para lo que aprenden de ti.");
+  var wp2=document.querySelectorAll("#screen-welcome details p")[1]; if(wp2)wp2.innerHTML=tt("<strong>Use this page once.</strong> After that, your AIs just work better — there is nothing here to come back to, no account with us, no app to download.","<strong>한 번만 쓰세요.</strong> 그 뒤엔 AI가 더 잘 도와요. 다시 올 곳도, 앱도 없어요.","<strong>Usa esta página una sola vez.</strong> Después, tus IA simplemente funcionan mejor — no hay nada a lo que volver, ni cuenta con nosotros, ni app que descargar.");
   // Outbound deep-link guidance, in chosen language
   document.querySelectorAll(".outbound-note").forEach(function(el){el.textContent=tt("We'll open the right page — just tap Allow/Create, then come back.","맞는 페이지를 열어요 — 허용/만들기만 누르고 돌아오세요.");});
   var bl=document.querySelector(".bubble-label"); if(bl)bl.textContent=tt("Read back from your home just now.","방금 내 공간에서 읽어 왔어요.");
   setTextId("successTitle",tt("Done","다 됐어요")); setTextId("workingTitle",tt("Working…","하고 있어요…"));
-  // Language toggle emphasis
-  var eb=$("langEnBtn"), kb=$("langKoBtn"); if(eb)eb.style.fontWeight=ko?"400":"800"; if(kb)kb.style.fontWeight=ko?"800":"400";
+  // Language toggle emphasis — the active language is unmistakable
+  var eb=$("langEnBtn"), kb=$("langKoBtn"), sb2=$("langEsBtn");
+  if(eb)eb.classList.toggle("on",LANG==="en"); if(kb)kb.classList.toggle("on",LANG==="ko"); if(sb2)sb2.classList.toggle("on",LANG==="es");
+  renderFullSet();
   renderFullSetLangOnly();
 }
 function renderFullSetLangOnly(){ /* fs buttons already re-texted above; full re-render keeps URLs */ }
@@ -1958,7 +2161,15 @@ var DYN_KO={
   "✓ Only you can open it":"✓ 나만 열 수 있어요","Checked in your database just now.":"방금 내 공간에서 확인했어요.",
   "Continue":"계속하기","Done":"다 됐어요"
 };
-function dyn(t){return (isKo()&&DYN_KO[t])?DYN_KO[t]:t;}
+var DYN_ES={
+  "Working…":"Trabajando…","Please keep this page open.":"Deja esta página abierta, por favor.",
+  "Creating your folder…":"Creando tu carpeta…","Checking your sign-in…":"Verificando tu acceso…",
+  "Creating your memory store…":"Creando tu espacio de memoria…","Joining everything together…":"Uniendo todo…","Joining the two together…":"Uniendo las dos partes…",
+  "✓ Your folder is private":"✓ Tu carpeta es privada","Checked on GitHub just now.":"Verificado en GitHub hace un momento.",
+  "✓ Only you can open it":"✓ Solo tú puedes abrirla","Checked in your database just now.":"Verificado en tu espacio hace un momento.",
+  "Continue":"Continuar","Done":"Listo"
+};
+function dyn(t){ if(LANG==="es")return DYN_ES[t]||t; return (isKo()&&DYN_KO[t])?DYN_KO[t]:t; }
 
 /* ============ wizard: one screen at a time, four obvious states ============ */
 var WIZ_SCREENS=["screen-welcome","step0","step1choice","step1signup","step1","step2","screen-working","screen-success","screen-failed","stepFullSet","step4","screen-extras","adminView"];
@@ -1970,7 +2181,7 @@ function showScreen(id){
   var pw=$("progressWrap");
   if(stepMap[id]){
     pw.classList.remove("hidden");
-    $("progressLabel").textContent=isKo()?("3단계 중 "+stepMap[id]+"단계"):("Step "+stepMap[id]+" of 3");
+    $("progressLabel").textContent=isKo()?("3단계 중 "+stepMap[id]+"단계"):(isEs()?("Paso "+stepMap[id]+" de 3"):("Step "+stepMap[id]+" of 3"));
     [1,2,3].forEach(function(n){
       var d=$("dot"+n); d.className=n===stepMap[id]?"on":(n<stepMap[id]?"done":"");
     });
@@ -1993,12 +2204,20 @@ var WIZ_WORK_TEXT_KO={
   "sb-readback":"다 있는지 확인해요…",
   "wire-config":"둘을 연결해요…","wire-connect":"둘을 연결해요…","wire-readback":"연결을 확인해요…"
 };
+var WIZ_WORK_TEXT_ES={
+  "gh-verify":"Verificando tu acceso…","gh-create":"Creando tu carpeta privada…",
+  "gh-upload":"Agregando tus archivos…","gh-readback":"Verificando que sea privada…",
+  "sb-verify":"Verificando tu acceso…","sb-create":"Creando tu espacio de memoria…",
+  "sb-active":"Esperando a que despierte…","sb-schema":"Bloqueándola solo para ti…",
+  "sb-readback":"Verificando que todo esté…",
+  "wire-config":"Uniendo las dos partes…","wire-connect":"Uniendo las dos partes…","wire-readback":"Verificando la unión…"
+};
 function startWorkPoll(listIds){
   stopWorkPoll();
   wizPoll=setInterval(function(){
     listIds.forEach(function(lid){
       var li=document.querySelector("#"+lid+" li.doing");
-      if(li){var map=isKo()?WIZ_WORK_TEXT_KO:WIZ_WORK_TEXT; var t=map[li.getAttribute("data-k")]; if(t)$("workingMsg").textContent=t;}
+      if(li){var map=isEs()?WIZ_WORK_TEXT_ES:(isKo()?WIZ_WORK_TEXT_KO:WIZ_WORK_TEXT); var t=map[li.getAttribute("data-k")]; if(t)$("workingMsg").textContent=t;}
     });
   },350);
 }
@@ -2018,15 +2237,15 @@ function showSuccessState(title,line,nextLabel,nextFn){
   showScreen("screen-success");
 }
 function plainError(tech,context){
-  var t=String(tech||""); var ko=isKo();
-  if(/token|connect|401|403|unauthor/i.test(t))return ko?"먼저 연결해 주세요 — 전 화면 자세히 보기에 있어요.":"You need to connect first — it's in Details on the previous screen.";
-  if(/already exists|422/i.test(t))return ko?"그 이름은 이미 있어요. 다시 하거나 이름을 바꿔 보세요.":"That name is already taken. Try again, or change the name in Details.";
-  if(/ACTIVE_HEALTHY|6 minutes/i.test(t))return ko?"평소보다 오래 걸려요. 1분 뒤 다시 해 보세요.":"It's taking longer than usual. Try again in a minute.";
-  if(/NOT private/i.test(t))return ko?"폴더가 비밀이 아니래요. 아직 쓰지 말고 다시 해 보세요.":"GitHub says the folder isn't private. Don't use it yet — try again.";
-  if(context==="github")return ko?"폴더가 안 만들어졌어요. 잃은 건 없어요 — 다시 해 보세요.":"Your folder wasn't created. Nothing is lost — try again.";
-  if(context==="supabase")return ko?"기억 공간이 안 만들어졌어요. 잃은 건 없어요 — 다시 해 보세요.":"Your memory store wasn't created. Nothing is lost — try again.";
-  if(context==="wire")return ko?"둘이 안 연결됐어요. 잃은 건 없어요 — 다시 해 보세요.":"The two halves didn't join. Nothing is lost — try again.";
-  return ko?"뭔가 잘못됐어요. 잃은 건 없어요 — 다시 해 보세요.":"Something went wrong. Nothing is lost — try again.";
+  var t=String(tech||""); var ko=isKo(), es=isEs();
+  if(/token|connect|401|403|unauthor/i.test(t))return es?"Primero necesitas conectar — está en Detalles, en la pantalla anterior.":(ko?"먼저 연결해 주세요 — 전 화면 자세히 보기에 있어요.":"You need to connect first — it's in Details on the previous screen.");
+  if(/already exists|422/i.test(t))return es?"Ese nombre ya está usado. Inténtalo de nuevo o cambia el nombre en Detalles.":(ko?"그 이름은 이미 있어요. 다시 하거나 이름을 바꿔 보세요.":"That name is already taken. Try again, or change the name in Details.");
+  if(/ACTIVE_HEALTHY|6 minutes/i.test(t))return es?"Tarda más de lo normal. Inténtalo en un minuto.":(ko?"평소보다 오래 걸려요. 1분 뒤 다시 해 보세요.":"It's taking longer than usual. Try again in a minute.");
+  if(/NOT private/i.test(t))return es?"GitHub dice que la carpeta no es privada. No la uses todavía — inténtalo de nuevo.":(ko?"폴더가 비밀이 아니래요. 아직 쓰지 말고 다시 해 보세요.":"GitHub says the folder isn't private. Don't use it yet — try again.");
+  if(context==="github")return es?"Tu carpeta no se creó. Nada se perdió — inténtalo de nuevo.":(ko?"폴더가 안 만들어졌어요. 잃은 건 없어요 — 다시 해 보세요.":"Your folder wasn't created. Nothing is lost — try again.");
+  if(context==="supabase")return es?"Tu espacio de memoria no se creó. Nada se perdió — inténtalo de nuevo.":(ko?"기억 공간이 안 만들어졌어요. 잃은 건 없어요 — 다시 해 보세요.":"Your memory store wasn't created. Nothing is lost — try again.");
+  if(context==="wire")return es?"Las dos partes no se unieron. Nada se perdió — inténtalo de nuevo.":(ko?"둘이 안 연결됐어요. 잃은 건 없어요 — 다시 해 보세요.":"The two halves didn't join. Nothing is lost — try again.");
+  return es?"Algo salió mal. Nada se perdió — inténtalo de nuevo.":(ko?"뭔가 잘못됐어요. 잃은 건 없어요 — 다시 해 보세요.":"Something went wrong. Nothing is lost — try again.");
 }
 function showFailedState(tech,context,retryFn,backScreen){
   stopWorkPoll();
@@ -2111,7 +2330,7 @@ function renderFullSet(){
   apps.forEach(function(a){
     var row=document.createElement("div"); row.className="fs-row";
     var n=document.createElement("span"); n.className="fs-name"; n.textContent=a[1];
-    var b=document.createElement("a"); b.className="btn small-btn secondary"; b.textContent=(typeof isKo==="function"&&isKo())?"무료로 받기":"Get it free";
+    var b=document.createElement("a"); b.className="btn small-btn secondary"; b.textContent=(typeof tt==="function")?tt("Get it free","무료로 받기","Gratis"):"Get it free";
     b.href=SIGNUP_URLS[a[0]]||"#"; b.target="_blank"; b.rel="noopener";
     row.appendChild(n); row.appendChild(b); c.appendChild(row);
   });
@@ -2141,12 +2360,14 @@ $("fullSetContinueBtn").addEventListener("click",function(){
 $("extrasFullSetBtn").addEventListener("click",function(){ fullSetReturn="screen-extras"; showScreen("stepFullSet"); });
 $("pastesFullSetBtn").addEventListener("click",function(){ fullSetReturn="step4"; showScreen("stepFullSet"); });
 renderFullSet();
+updateNotionMirror();
 $("doneExtrasBtn").addEventListener("click",function(){ showScreen("screen-extras"); });
 $("welcomeExtrasBtn").addEventListener("click",function(){ showScreen("screen-extras"); });
 $("backToDoneBtn").addEventListener("click",function(){ showScreen(S.repoDone||S.wired?"step4":"screen-welcome"); });
 /* Language toggle + never-lose-your-place restore */
 if($("langEnBtn"))$("langEnBtn").addEventListener("click",function(){LANG="en"; savePlace(); applyLang();});
 if($("langKoBtn"))$("langKoBtn").addEventListener("click",function(){LANG="ko"; savePlace(); applyLang();});
+if($("langEsBtn"))$("langEsBtn").addEventListener("click",function(){LANG="es"; savePlace(); applyLang();});
 ["fName","fEmail"].forEach(function(id){var el=$(id); if(el)el.addEventListener("input",function(){savePlace();});});
 document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest("a[target='_blank']"):null; if(a)savePlace();},true);
 applyLang();
